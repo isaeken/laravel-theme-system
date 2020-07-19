@@ -1,0 +1,34 @@
+{
+    "name": "isaeken/laravel-theme-system",
+    "description": "Theme system for Laravel Framework",
+    "type": "library",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "İsa Eken",
+            "email": "hello@isaeken.com.tr"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "IsaEken\\ThemeSystem\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "IsaEken\\ThemeSystem\\ThemeSystemServiceProvider"
+            ],
+            "aliases": {
+                "ThemeSystem": "IsaEken\\ThemeSystem\\Facades\\ThemeSystem"
+            }
+        }
+    },
+    "require": {
+        "laravel/framework": "^7.0@dev",
+        "ext-zip": "*",
+        "ext-json": "*",
+        "ext-fileinfo": "*"
+    }
+}

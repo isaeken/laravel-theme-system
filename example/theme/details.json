@@ -1,0 +1,11 @@
+{
+    "name": "Example Theme",
+    "description": "This is example theme!",
+    "version": "1.0",
+    "authors": [
+        {
+            "name": "İsa Eken",
+            "email": "hello@isaeken.com.tr"
+        }
+    ]
+}
