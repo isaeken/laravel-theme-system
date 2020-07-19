@@ -36,28 +36,6 @@ In this repository, you can find the theme system for the framework PHP, Laravel
    - *Note: You can blank to ``settings.json`` but this file is required.*
    - Convert to ``zip`` these files.
 
-- create themes folder to application base path and create a basic theme
-  
-  *files will look something like this:*
-  ````
-  .
-  ├── app
-  ├── bootstrap
-  ├── config
-  ├── themes                    <- Your theme folder
-  │   ├── default theme
-  │   │   ├── assets            <- Your asset folder
-  │   │   │   ├── css
-  │   │   │   │   └── app.css
-  │   │   │   └── js
-  │   │   │       └── app.js
-  │   │   ├── views             <- Your view folder
-  │   │   │   └── home.blade.php
-  │   │   ├── details.json      <- Your theme details
-  │   │   └── settings.json     <- Your theme settings
-  ├── vendor
-  └── .env
-  ````
 - Install your default theme to your project using php
     ````php
     /**
