@@ -29,9 +29,8 @@ class AssetController extends Controller
     {
         $themeName = ThemeSystem::theme()->name;
         abort_if($themeName == null, 404);
-
         $path = base_path('/themes/'.$themeName.'/assets/'.$asset);
-        abort_if(!file_exists($path), 404);
+        abort_if(is_dir($path) || !file_exists($path), 404);
 
         $cacheName = 'isaeken.themesystem.'.$themeName.'.'.$asset;
         if (ThemeSystem::$cacheAssets)

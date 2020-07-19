@@ -5,4 +5,4 @@
  * @license MIT
  */
 
-Route::get('/assets/{asset}', 'IsaEken\ThemeSystem\Controllers\AssetController@index');
+Route::get('/assets/{asset}', 'IsaEken\ThemeSystem\Controllers\AssetController@index')->where('asset', '.*');
