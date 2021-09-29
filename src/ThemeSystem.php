@@ -54,8 +54,8 @@ class ThemeSystem
 
             if ($this->isExists($path)) {
                 $themes[] = (object) [
-                    'directory'  => theme_path($path),
-                    'name'       => $path,
+                    'directory' => theme_path($path),
+                    'name' => $path,
                     'publicName' => Str::snake($path, '-'),
                 ];
             }
@@ -63,7 +63,6 @@ class ThemeSystem
 
         return $themes;
     }
-
 
     /**
      * Get public directory name.
@@ -84,7 +83,6 @@ class ThemeSystem
     {
         return config('theme-system.themes_directory', resource_path('themes')) ?? resource_path('themes');
     }
-
 
     /**
      * Get current theme name.
@@ -116,7 +114,6 @@ class ThemeSystem
         return config('theme-system.theme', 'default') ?? 'default';
     }
 
-
     /**
      * Get current theme directory.
      *
@@ -136,7 +133,7 @@ class ThemeSystem
             return $this->getDefaultThemeDirectory();
         }
 
-        if (!$this->isExists($theme)) {
+        if (! $this->isExists($theme)) {
             throw_unless($fallback, ThemeNotExistsException::class, $theme);
 
             return $this->getDefaultThemeDirectory();
@@ -155,7 +152,6 @@ class ThemeSystem
         return app('config')['view.paths'][0] ?? resource_path('views');
     }
 
-
     /**
      * Change current theme.
      *
@@ -167,11 +163,9 @@ class ThemeSystem
     {
         if ($name == 'default' || $name == null) {
             $this->theme = $this->getDefaultTheme();
-        }
-        else if ($this->isExists($name)) {
+        } elseif ($this->isExists($name)) {
             $this->theme = $name;
-        }
-        else {
+        } else {
             throw new ThemeNotExistsException($name);
         }
 
@@ -192,7 +186,6 @@ class ThemeSystem
             preg_match(config('theme-system.name_regex', '/(.[a-zA-Z0-9-_]+)/'), $name) !== false;
     }
 
-
     /**
      * Resolve theme directories.
      *
@@ -205,6 +198,7 @@ class ThemeSystem
         if ($this->isFallbackEnabled()) {
             $paths[] = $this->getDefaultThemeDirectory();
         }
+
         return $paths;
     }
 }

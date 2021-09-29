@@ -26,7 +26,7 @@ class ThemeSystemServiceProvider extends PackageServiceProvider
     public function packageBooted()
     {
         $this->app->singleton(ThemeSystem::class, function ($app) {
-            return new ThemeSystem;
+            return new ThemeSystem();
         });
 
         if (config('theme-system.enable')) {

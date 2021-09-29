@@ -2,7 +2,7 @@
 
 use IsaEken\ThemeSystem\ThemeSystem;
 
-if (!function_exists('theme_system')) {
+if (! function_exists('theme_system')) {
     /**
      * Get theme system instance.
      *
@@ -14,7 +14,7 @@ if (!function_exists('theme_system')) {
     }
 }
 
-if (!function_exists('theme_path')) {
+if (! function_exists('theme_path')) {
     /**
      * Get the path to the theme folder.
      *

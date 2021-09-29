@@ -32,8 +32,9 @@ class PublishCommand extends Command
         foreach ($this->links() as $link => $target) {
             $link = public_path($link);
 
-            if (file_exists($link) && !$this->isRemovableSymlink($link, $this->option('force'))) {
+            if (file_exists($link) && ! $this->isRemovableSymlink($link, $this->option('force'))) {
                 $this->error("The [$link] link already exists.");
+
                 continue;
             }
 
@@ -43,8 +44,7 @@ class PublishCommand extends Command
 
             if ($this->option('relative')) {
                 $this->laravel->make('files')->relativeLink($target, $link);
-            }
-            else {
+            } else {
                 $this->laravel->make('files')->link($target, $link);
             }
 
@@ -65,7 +65,7 @@ class PublishCommand extends Command
         foreach (theme_system()->findThemes() as $theme) {
             $directory = $theme->directory . '/' . theme_system()->getPublicDirectory();
 
-            if (!is_dir($directory)) {
+            if (! is_dir($directory)) {
                 continue;
             }
 

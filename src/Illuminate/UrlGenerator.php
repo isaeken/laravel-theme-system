@@ -21,7 +21,7 @@ class UrlGenerator extends \Illuminate\Routing\UrlGenerator
         }
 
         $root = $this->assetRoot ?: $this->formatRoot($this->formatScheme($secure));
-        
+
         $theme = Str::snake(theme_system()->getCurrentTheme(), '-');
         if ($theme === 'default') {
             $theme = '';

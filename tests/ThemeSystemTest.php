@@ -17,7 +17,7 @@ it('change theme', function () {
     assertEquals(theme_system()->getCurrentTheme(), 'default');
 
     $themeDirectory = theme_system()->getThemesDirectory() . '/testing';
-    if (!is_dir($themeDirectory)) {
+    if (! is_dir($themeDirectory)) {
         mkdir(theme_system()->getThemesDirectory() . '/testing', recursive: true);
     }
 
