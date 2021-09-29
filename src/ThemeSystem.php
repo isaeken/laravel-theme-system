@@ -1,323 +1,210 @@
 <?php
-/**
- * Laravel Theme System
- * @author İsa Eken <hello@isaeken.com.tr>
- * @license MIT
- */
 
 namespace IsaEken\ThemeSystem;
 
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Str;
-use Illuminate\View\View;
-use IsaEken\ThemeSystem\Models\Theme;
-use IsaEken\ThemeSystem\Models\User;
-use IsaEken\ThemeSystem\Models\UserTheme;
+use IsaEken\ThemeSystem\Exceptions\ThemeNotExistsException;
 
-/**
- * Class ThemeSystem
- * @package IsaEken\ThemeSystem
- */
 class ThemeSystem
 {
+    private string|null $theme = null;
+
     /**
-     * @param string $directory
+     * Check the Theme System is enabled.
+     *
      * @return bool
      */
-    private static function rmdir(string $directory) : bool
+    public function isEnabled(): bool
     {
-        if (is_dir($directory))
-        {
-            $objects = scandir($directory);
-            foreach ($objects as $object)
-            {
-                if ($object != '.' && $object != '..')
-                {
-                    if (filetype($directory.'/'.$object) == 'dir')
-                        self::rmdir($directory.'/'.$object);
-                    else
-                        unlink($directory.'/'.$object);
-                }
-            }
-            reset($objects);
-            return rmdir($directory);
-        }
-        return false;
+        return config('theme-system.enable', true) ?? true;
     }
 
     /**
-     * @var bool $compressAssets
-     */
-    public static $compressAssets = false;
-
-    /**
-     * @var bool $cacheAssets
-     */
-    public static $cacheAssets = true;
-
-    /**
-     * @return Theme|null
-     */
-    public static function theme() : ?Theme
-    {
-        if (Auth::check())
-        {
-            $user = User::where('id', Auth::id())->first();
-            $theme = $user->theme()->first();
-            if ($theme != null) return Theme::where('id', $theme->theme_id)->where('state', 'active')->first();
-        }
-        if (Cookie::has('isaeken_app_theme'))
-        {
-            $theme = Theme::where('state', 'active')->where('id', Cookie::get('isaeken_app_theme'))->limit(1)->first();
-            if ($theme != null) return $theme;
-        }
-        $theme = Theme::where('default', true)->where('state', 'active')->limit(1)->first();
-        abort_if($theme == null, 500, __('Missing default theme!'));
-        return $theme;
-    }
-
-    /**
-     * @param Theme $theme
-     */
-    public static function change(Theme $theme) : void
-    {
-        if ($theme == null) throw new \InvalidArgumentException();
-        if (Auth::check())
-        {
-            $userTheme = UserTheme::where('user_id', Auth::id())->first();
-            if ($userTheme == null)
-                UserTheme::create([
-                    'user_id' => Auth::id(),
-                    'theme_id' => $theme->id,
-                ]);
-            else
-            {
-                $userTheme->theme_id = $theme->id;
-                $userTheme->save();
-            }
-        }
-        else
-        {
-            Cookie::queue('isaeken_app_theme', $theme->id, 2628000);
-        }
-    }
-
-    /**
-     * @param $view
-     * @param array $data
-     * @param array $mergeData
-     * @return Application|Factory|View
-     */
-    public static function view($view, $data = [], $mergeData = [])
-    {
-        $theme = self::Theme();
-        if ($theme != null)
-        {
-            \view()->addNamespace(
-                $theme->name,
-                base_path('themes/'.$theme->name.'/views')
-            );
-            if (\view()->exists($theme->name.'::'.$view)) return \view($theme->name.'::'.$view, $data, $mergeData);
-            return \view($view, $data, $mergeData);
-        }
-        return \view($view, $data, $mergeData);
-    }
-
-    /**
-     * @param string $themeName
+     * Check fallback is enabled.
+     *
      * @return bool
      */
-    public static function isInstalled(string $themeName) : bool
+    public function isFallbackEnabled(): bool
     {
-        $theme = Theme::where('name', $themeName)->first();
-        if ($theme == null) return false;
-        if (is_dir(base_path('/themes/'.$themeName))) return true;
-        return false;
+        return config('theme-system.fallback_enable', true) ?? true;
     }
 
     /**
-     * @param string $themeFile
-     * @param bool $setDefault
-     * @return object
-     */
-    public static function install(string $themeFile, bool $setDefault = false) : object
-    {
-        if (!is_dir(base_path('/themes'))) mkdir(base_path('/themes'));
-        if (!is_dir(base_path('/themes/tmp'))) mkdir(base_path('/themes/tmp'));
-
-        $tempDirectory = base_path('/themes/tmp');
-        $tempThemeDirectory = $tempDirectory.'/'.Str::random();
-        $themeName = null;
-        $paths = array(
-            'views' => 'dir',
-            'assets' => 'dir',
-            'details.json' => 'file',
-        );
-        $detailProperties = array(
-            'name',
-            'version',
-            'app-version',
-        );
-        $details = new \StdClass;
-        $settings = new \StdClass;
-
-        /**
-         * Check $themeFile is exists
-         */
-        if (!file_exists($themeFile)) return (object) array( 'valid' => false, 'installed' => false, 'message' => "File '{$themeFile}' not exists" );
-
-        /**
-         * Initialize archive
-         */
-        $zip = new \ZipArchive;
-
-        /**
-         * Try to open archive
-         */
-        $res = $zip->open($themeFile);
-        if ($res !== true) return (object) array( 'valid' => false, 'installed' => false, 'message' => "Failed to open file: '{$themeFile}'" );
-
-        /**
-         * Create temporary directory
-         */
-        if (!is_dir($tempDirectory)) mkdir($tempDirectory);
-        if (is_dir($tempThemeDirectory)) rmdir($tempThemeDirectory);
-        mkdir($tempThemeDirectory);
-
-        /**
-         * Extract theme to temporary directory
-         */
-        $zip->extractTo($tempThemeDirectory);
-
-        /**
-         * Close archive
-         */
-        $zip->close();
-
-        /**
-         * Check theme files
-         */
-        foreach ($paths as $path => $type)
-        {
-            if ($type == 'dir')
-            {
-                if (!is_dir($tempThemeDirectory.'/'.$path))
-                    return (object) array( 'valid' => false, 'installed' => false, 'message' => "Directory not exists in theme: ".'/'.$path );
-            }
-            else if ($type == 'file')
-            {
-                if (!file_exists($tempThemeDirectory.'/'.$path))
-                    return (object) array( 'valid' => false, 'installed' => false, 'message' => "File not exists in theme: ".'/'.$path );
-            }
-        }
-
-        /**
-         * Set variables
-         */
-
-        $details = json_decode(file_get_contents($tempThemeDirectory.'/details.json'), false);
-        $settings = (
-            file_exists($tempThemeDirectory.'/settings.json') ?
-            json_decode(file_get_contents($tempThemeDirectory.'/settings.json'), false) : null
-        );
-
-        /**
-         * Check details
-         */
-        foreach ($detailProperties as $property)
-            if (!isset($details->${$property}) || empty($details->${$property}))
-                return (object) array(
-                    'valid' => false,
-                    'message' => "'${$property}' property not defined in 'details.json'"
-                );
-
-        /**
-         * Create theme name
-         */
-        $themeName = Str::slug($details->name, '_');
-
-        /**
-         * Check theme is already installed
-         */
-        if (
-            is_dir(base_path('/themes/'.$themeName)) ||
-            Theme::where('name', $themeName)->first() != null
-        ) return (object) array( 'valid' => true, 'installed' => false, 'message' => 'Theme already installed' );
-
-        /**
-         * Install theme
-         */
-        $theme = Theme::create([
-            'state' => 'active',
-            'default' => false,
-            'name' => $themeName,
-            'details' => $details,
-            'settings' => $settings,
-        ]);
-        if ($setDefault) self::setDefault($theme);
-        rename($tempThemeDirectory, base_path('/themes/'.$themeName));
-
-        return (object) array(
-            'valid' => true,
-            'installed' => true,
-            'message' => 'Theme is installed.'
-        );
-    }
-
-    /**
-     * @param string $themeName
-     * @param bool $withFiles
-     * @param bool $forceDelete
+     * Check assets is enabled.
+     *
      * @return bool
      */
-    public static function uninstall(string $themeName, bool $withFiles = false, bool $forceDelete = false) : bool
+    public function isAssetsEnabled(): bool
     {
-        /**
-         * Check theme is installed
-         */
-        if (!self::isInstalled($themeName)) return false;
-
-        /**
-         * Get theme in database
-         */
-        $theme = Theme::where('name', $themeName)->first();
-
-        /**
-         * if force delete enabled just add deleted flag to theme else delete from database
-         */
-        if ($forceDelete) $theme->delete();
-        else
-        {
-            $theme->state = 'deleted';
-            $theme->save();
-        }
-
-        /**
-         * check if delete with files
-         */
-        if ($withFiles)
-        {
-            /**
-             * try to delete theme files
-             */
-            if (self::rmdir(base_path('/themes/'.$themeName))) return true;
-            else return false;
-        }
-        return true;
+        return config('theme-system.assets', true) ?? true;
     }
 
     /**
-     * @param Theme $theme
+     * Find themes.
+     *
+     * @return array
      */
-    public static function setDefault(Theme $theme) : void
+    public function findThemes(): array
     {
-        if ($theme == null) throw new \InvalidArgumentException();
-        Theme::where('id', $theme->id)->get()->each(function ($theme) {
-            $theme->update([ 'default' => false ]);
-        });
-        $theme->update([ 'default' => true ]);
+        $themes = [];
+        foreach (scandir(theme_path()) as $path) {
+            if ($path == '.' || $path == '..') {
+                continue;
+            }
+
+            if ($this->isExists($path)) {
+                $themes[] = (object) [
+                    'directory'  => theme_path($path),
+                    'name'       => $path,
+                    'publicName' => Str::snake($path, '-'),
+                ];
+            }
+        }
+
+        return $themes;
+    }
+
+
+    /**
+     * Get public directory name.
+     *
+     * @return string
+     */
+    public function getPublicDirectory(): string
+    {
+        return config('theme-system.public', 'public') ?? 'public';
+    }
+
+    /**
+     * Get a themes directory.
+     *
+     * @return string
+     */
+    public function getThemesDirectory(): string
+    {
+        return config('theme-system.themes_directory', resource_path('themes')) ?? resource_path('themes');
+    }
+
+
+    /**
+     * Get current theme name.
+     *
+     * @return string
+     */
+    public function getCurrentTheme(): string
+    {
+        $theme = $this->theme;
+
+        if ($theme == 'default' || $theme === null) {
+            return 'default';
+        }
+
+        if (mb_strlen($theme) > 0) {
+            return $theme;
+        }
+
+        return $this->getDefaultTheme();
+    }
+
+    /**
+     * Get default theme name.
+     *
+     * @return string
+     */
+    public function getDefaultTheme(): string
+    {
+        return config('theme-system.theme', 'default') ?? 'default';
+    }
+
+
+    /**
+     * Get current theme directory.
+     *
+     * @param  bool|null  $fallback
+     *
+     * @return string
+     */
+    public function getCurrentThemeDirectory(bool|null $fallback = null): string
+    {
+        if ($fallback === null) {
+            $fallback = $this->isFallbackEnabled();
+        }
+
+        $theme = $this->getCurrentTheme();
+
+        if ($theme === 'default') {
+            return $this->getDefaultThemeDirectory();
+        }
+
+        if (!$this->isExists($theme)) {
+            throw_unless($fallback, ThemeNotExistsException::class, $theme);
+
+            return $this->getDefaultThemeDirectory();
+        }
+
+        return theme_path($theme);
+    }
+
+    /**
+     * Get default theme directory.
+     *
+     * @return string
+     */
+    public function getDefaultThemeDirectory(): string
+    {
+        return app('config')['view.paths'][0] ?? resource_path('views');
+    }
+
+
+    /**
+     * Change current theme.
+     *
+     * @param  string|null  $name
+     *
+     * @return $this
+     */
+    public function setTheme(string|null $name): static
+    {
+        if ($name == 'default' || $name == null) {
+            $this->theme = $this->getDefaultTheme();
+        }
+        else if ($this->isExists($name)) {
+            $this->theme = $name;
+        }
+        else {
+            throw new ThemeNotExistsException($name);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Check the theme is exists.
+     *
+     * @param  string  $name
+     *
+     * @return bool
+     */
+    public function isExists(string $name): bool
+    {
+        return
+            theme_path($name) !== false &&
+            preg_match(config('theme-system.name_regex', '/(.[a-zA-Z0-9-_]+)/'), $name) !== false;
+    }
+
+
+    /**
+     * Resolve theme directories.
+     *
+     * @return array
+     */
+    public function resolvePaths(): array
+    {
+        $paths = [];
+        $paths[] = $this->getCurrentThemeDirectory(false);
+        if ($this->isFallbackEnabled()) {
+            $paths[] = $this->getDefaultThemeDirectory();
+        }
+        return $paths;
     }
 }

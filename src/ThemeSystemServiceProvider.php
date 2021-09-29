@@ -1,45 +1,51 @@
 <?php
-/**
- * Laravel Theme System
- * @author İsa Eken <hello@isaeken.com.tr>
- * @license MIT
- */
 
 namespace IsaEken\ThemeSystem;
 
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\ServiceProvider;
+use IsaEken\ThemeSystem\Commands\PublishCommand;
+use IsaEken\ThemeSystem\Illuminate\FileViewFinder;
+use IsaEken\ThemeSystem\Illuminate\UrlGenerator;
+use Spatie\LaravelPackageTools\Package;
+use Spatie\LaravelPackageTools\PackageServiceProvider;
 
-/**
- * Class ThemeSystemServiceProvider
- * @package IsaEken\ThemeSystem
- */
-class ThemeSystemServiceProvider extends ServiceProvider
+class ThemeSystemServiceProvider extends PackageServiceProvider
 {
-    public function boot()
+    public function configurePackage(Package $package): void
     {
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-        $this->loadRoutesFrom(__DIR__.'/routes/web.php');
+        $package
+            ->name('theme-system')
+            ->hasConfigFile()
+            ->hasCommand(PublishCommand::class);
     }
 
-    public function register()
+    public function registeringPackage()
     {
-        require_once __DIR__.'/Support/Helpers.php';
-
-        Blade::if('theme', function ($key) {
-            return ThemeSystem::theme()->setting($key) == true;
-        });
-
-        Blade::if('page', function ($page) {
-            $isCurrentRoute = Route::getCurrentRoute()->getName() == $page;
-            if (!$isCurrentRoute) $isCurrentRoute = Route::getCurrentRoute()->getActionName() == $page;
-            return $isCurrentRoute;
-        });
+        require_once __DIR__ . '/helpers.php';
     }
 
-    public function provides()
+    public function packageBooted()
     {
-        return [ 'themesystem' ];
+        $this->app->singleton(ThemeSystem::class, function ($app) {
+            return new ThemeSystem;
+        });
+
+        if (config('theme-system.enable')) {
+            /** @var ThemeSystem $themeSystem */
+            $themeSystem = app(ThemeSystem::class);
+            $themeSystem->setTheme(config('theme-system.theme'));
+
+            $this->app->bind('view.finder', function ($app) use ($themeSystem) {
+                return new FileViewFinder($app['files'], $themeSystem->resolvePaths());
+            });
+
+            if ($themeSystem->isAssetsEnabled()) {
+                $this->app->singleton('url', function ($app) {
+                    return new UrlGenerator(
+                        app('router')->getRoutes(),
+                        app('request')
+                    );
+                });
+            }
+        }
     }
 }

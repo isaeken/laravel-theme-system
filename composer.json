@@ -1,19 +1,55 @@
 {
     "name": "isaeken/laravel-theme-system",
-    "description": "Theme system for Laravel Framework",
+    "version": "v2.0",
+    "description": "Theme system for Laravel",
+    "keywords": [
+        "theme",
+        "system",
+        "laravel",
+        "isaeken"
+    ],
+    "homepage": "https://github.com/isaeken/laravel-theme-system",
     "type": "library",
     "license": "MIT",
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "authors": [
         {
             "name": "İsa Eken",
-            "email": "hello@isaeken.com.tr"
+            "email": "hello@isaeken.com.tr",
+            "role": "Founder",
+            "homepage": "https://www.isaeken.com.tr"
         }
     ],
+    "require": {
+        "php": "^8.0",
+        "spatie/laravel-package-tools": "^1.9",
+        "illuminate/contracts": "^8.62"
+    },
+    "require-dev": {
+        "nunomaduro/collision": "^5.10",
+        "orchestra/testbench": "^6.21",
+        "pestphp/pest": "^1.20",
+        "pestphp/pest-plugin-laravel": "^1.1",
+        "spatie/laravel-ray": "^1.26",
+        "vimeo/psalm": "^4.10"
+    },
     "autoload": {
         "psr-4": {
-            "IsaEken\\ThemeSystem\\": "src/"
+            "IsaEken\\ThemeSystem\\": "src"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "IsaEken\\ThemeSystem\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "./vendor/bin/pest --no-coverage",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+    },
+    "config": {
+        "sort-packages": true
     },
     "extra": {
         "laravel": {
@@ -21,14 +57,8 @@
                 "IsaEken\\ThemeSystem\\ThemeSystemServiceProvider"
             ],
             "aliases": {
-                "ThemeSystem": "IsaEken\\ThemeSystem\\Facades\\ThemeSystem"
+                "ThemeSystem": "IsaEken\\ThemeSystem\\ThemeSystemFacade"
             }
         }
-    },
-    "require": {
-        "laravel/framework": "^7.0@dev",
-        "ext-zip": "*",
-        "ext-json": "*",
-        "ext-fileinfo": "*"
     }
 }
