@@ -63,18 +63,18 @@ class InitializeCommand extends Command
      */
     public function handle(): void
     {
-        if (!$this->isInstalled()) {
-            if (!file_exists(base_path('webpack.mix.js'))) {
+        if (! $this->isInstalled()) {
+            if (! file_exists(base_path('webpack.mix.js'))) {
                 File::put(base_path('webpack.mix.js'), '');
             }
 
-            if (file_exists(base_path('webpack.mix.js')) && !file_exists(base_path(Webpack::defaultWebpackPath()))) {
+            if (file_exists(base_path('webpack.mix.js')) && ! file_exists(base_path(Webpack::defaultWebpackPath()))) {
                 $this->info('Copying "webpack.mix.js" to ' . base_path(Webpack::defaultWebpackPath()));
                 File::copy(base_path('webpack.mix.js'), base_path(Webpack::defaultWebpackPath()));
             }
-        }
-        else {
+        } else {
             $this->error('Theme system already initialized.');
+
             return;
         }
 
@@ -83,7 +83,7 @@ class InitializeCommand extends Command
         $this->info('Created main "webpack.mix.js".');
 
         foreach (theme_system()->findThemes() as $theme) {
-            if (!File::exists("$theme->directory/webpack.mix.js")) {
+            if (! File::exists("$theme->directory/webpack.mix.js")) {
                 File::put("$theme->directory/webpack.mix.js", Webpack::generateTheme());
                 $this->info("Created webpack config for theme: $theme->name");
             }

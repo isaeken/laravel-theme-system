@@ -34,6 +34,7 @@ class CreateCommand extends Command
         $name = $this->argument('name');
         if (theme_system()->isExists($name)) {
             $this->error("The theme '$name' is exists.");
+
             return;
         }
 

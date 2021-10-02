@@ -41,6 +41,7 @@ class Webpack
     {
         $package = ThemeSystem::PackageName;
         $version = ThemeSystem::Version;
+
         return "// $package ($version)";
     }
 
