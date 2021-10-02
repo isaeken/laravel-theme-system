@@ -8,7 +8,9 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/isaeken/laravel-theme-system/Check%20&%20fix%20styling?label=code%20style)](https://github.com/isaeken/laravel-theme-system/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/isaeken/laravel-theme-system.svg?style=flat-square)](https://packagist.org/packages/isaeken/laravel-theme-system)
 
-## Installation
+## Installation and setup
+
+### Installation
 
 You can install the package via composer:
 
@@ -16,81 +18,19 @@ You can install the package via composer:
 composer require isaeken/laravel-theme-system
 ```
 
+### Setup
+
 You can publish the config file with:
 
 ```bash
 php artisan vendor:publish --provider="IsaEken\ThemeSystem\ThemeSystemServiceProvider" --tag="theme-system-config"
 ```
 
-This is the contents of the published config file:
+Run the following command in the terminal for initializing:
 
-```php
-// config for IsaEken/ThemeSystem
-return [
-    /*
-    |--------------------------------------------------------------------------
-    | Enable the Theme System
-    |--------------------------------------------------------------------------
-    */
-
-    'enable' => true,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Enable fallback
-    |--------------------------------------------------------------------------
-    |
-    | When you enable this, the files that are not found will be taken from
-    | the default theme.
-    |
-    */
-
-    'fallback_enable' => true,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Enable assets
-    |--------------------------------------------------------------------------
-    |
-    | Activate it and the "asset" function will change and generate the
-    | address of the theme's shared folder.
-    */
-
-    'assets' => true,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Default theme name. (default)
-    |--------------------------------------------------------------------------
-    */
-
-    'theme' => null,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Theme name regex
-    |--------------------------------------------------------------------------
-    */
-
-    'name_regex' => '/(.[a-zA-Z0-9-_]+)/',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Public assets folder for themes
-    |--------------------------------------------------------------------------
-    */
-
-    'public_directory' => 'public',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Theme installation directory
-    |--------------------------------------------------------------------------
-    */
-
-    'themes_directory' => resource_path('themes'),
-];
-```
+````shell
+php artisan themes:init
+````
 
 ## Usage
 
@@ -108,15 +48,58 @@ theme_system()->getCurrentTheme();
 
 ### Creating theme
 
-Create ``themes`` directory in to ``resources`` path.
+Run the following command in the terminal.
 
-Create your theme in ``resources/themes/your-theme-name``.
+````shell
+php artisan make:theme your-theme-name
+````
 
-Add assets to ``resources/themes/your-theme-name/public/image.jpg``
+Change theme in PHP or application config.
 
-Add views to ``resources/themes/your-theme-name``
+### Webpack
 
-Change theme in php or application config.
+> Do not change the main ``webpack.mix.js`` file.
+
+A special ``"webpack.mix.js"`` file is created for each theme.
+
+The ``"webpack.mix.js"`` file of the default theme is in the ``"resources"`` folder.
+
+You can continue to use the ``"webpack.mix.js"`` as normal in the default theme.
+
+However, in themes you should use it as in the example.
+
+````js
+const mix = require('laravel-mix');
+
+mix
+    .js(themeResourceRoot + '/js/app.js', 'js')
+    .postCss(themeResourceRoot + '/css/app.css', 'css', [
+        //
+    ]);
+
+exports.mix = mix;
+````
+
+### Middleware to set a theme
+
+Register ``ThemeMiddleware`` in ``app\Http\Kernel.php``:
+
+````php
+protected $routeMiddleware = [
+    // ...
+    'theme' => \IsaEken\ThemeSystem\Http\Middlewares\ThemeMiddleware::class,
+];
+````
+
+Example usages:
+
+````php
+Route::group(['middleware' => 'theme:your-theme-name'], function () {
+    // ...
+});
+
+Route::get('/hello-world', fn () => 'Hello World!')->middleware('theme:your-theme-name');
+````
 
 ### If you need to advanced methods, see ThemeSystem class.
 
