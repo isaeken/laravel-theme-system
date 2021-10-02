@@ -1,4 +1,7 @@
+
 # Laravel Theme System
+
+![Laravel Theme System](https://banners.beyondco.de/Laravel%20Theme%20System.png?theme=light&packageManager=composer%20require&packageName=isaeken/laravel-theme-system&pattern=architect&style=style_1&description=Make%20multiple%20themes%20for%20your%20Laravel%20application&md=1&showWatermark=1&fontSize=100px&images=https://laravel.com/img/logomark.min.svg)
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/isaeken/laravel-theme-system.svg?style=flat-square)](https://packagist.org/packages/isaeken/laravel-theme-system)
 [![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/isaeken/laravel-theme-system/run-tests?label=tests)](https://github.com/isaeken/laravel-theme-system/actions?query=workflow%3Arun-tests+branch%3Amain)
