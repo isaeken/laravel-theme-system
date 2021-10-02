@@ -2,6 +2,7 @@
 
 namespace IsaEken\ThemeSystem;
 
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use IsaEken\ThemeSystem\Exceptions\ThemeNotExistsException;
 
@@ -190,6 +191,40 @@ class ThemeSystem
         return
             theme_path($name) !== false &&
             preg_match(config('theme-system.name_regex', '/(.[a-zA-Z0-9-_]+)/'), $name) !== false;
+    }
+
+    /**
+     * Make a new theme if not exists.
+     *
+     * @param  string  $name
+     */
+    public function make(string $name): void
+    {
+        if ($this->isExists($name)) {
+            return;
+        }
+
+        $directory = $this->getThemesDirectory() . "/$name";
+
+        $directories = [
+            "$directory/public",
+            "$directory/resources/css",
+            "$directory/resources/js",
+        ];
+
+        $files = [
+            "$directory/webpack.mix.js" => Webpack::generateTheme(),
+            "$directory/resources/css/app.css" => "",
+            "$directory/resources/js/app.js" => "",
+        ];
+
+        foreach ($directories as $directory) {
+            File::makeDirectory($directory, recursive: true);
+        }
+
+        foreach ($files as $file => $contents) {
+            File::put($file, $contents);
+        }
     }
 
     /**
