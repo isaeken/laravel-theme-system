@@ -23,3 +23,19 @@ All notable changes to `laravel-theme-system` will be documented in this file.
 - added ThemeNotExistsException
 - added PublishCommand
 - added tests
+
+## 2.1 - 2021-10-03
+
+- added circleci config
+- updated issue templates
+- updated badges in readme
+- added create command
+- added initialize command
+- added publish command
+- added custom webpack support for all themes
+
+## 2.2 - 2021-10-03
+
+- refactored create command to make command
+- added make method in ThemeSystem class
+- added theme middleware
