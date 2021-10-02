@@ -2,6 +2,7 @@
 
 namespace IsaEken\ThemeSystem;
 
+use IsaEken\ThemeSystem\Commands\InitializeCommand;
 use IsaEken\ThemeSystem\Commands\PublishCommand;
 use IsaEken\ThemeSystem\Illuminate\FileViewFinder;
 use IsaEken\ThemeSystem\Illuminate\UrlGenerator;
@@ -15,7 +16,10 @@ class ThemeSystemServiceProvider extends PackageServiceProvider
         $package
             ->name('theme-system')
             ->hasConfigFile()
-            ->hasCommand(PublishCommand::class);
+            ->hasCommands(
+                PublishCommand::class,
+                InitializeCommand::class,
+            );
     }
 
     public function registeringPackage()
