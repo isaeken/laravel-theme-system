@@ -19,6 +19,7 @@ class ThemeMiddleware
     public function handle(Request $request, Closure $next, string $theme): mixed
     {
         theme_system()->setTheme($theme);
+
         return $next($request);
     }
 }

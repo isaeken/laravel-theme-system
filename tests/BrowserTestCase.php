@@ -3,10 +3,8 @@
 namespace IsaEken\ThemeSystem\Tests;
 
 use Illuminate\Routing\Router;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use IsaEken\ThemeSystem\Http\Middlewares\ThemeMiddleware;
-use IsaEken\ThemeSystem\ThemeSystem;
 use IsaEken\ThemeSystem\ThemeSystemServiceProvider;
 use Orchestra\Testbench\BrowserKit\TestCase as BaseTestCase;
 
@@ -26,7 +24,7 @@ abstract class BrowserTestCase extends BaseTestCase
     {
         $themeName = 'browser-test-theme';
 
-        if (!theme_system()->isExists($themeName)) {
+        if (! theme_system()->isExists($themeName)) {
             theme_system()->make($themeName);
             File::put(theme_path($themeName) . "/testing.blade.php", 'Testing');
         }

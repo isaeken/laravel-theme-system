@@ -2,8 +2,8 @@
 
 namespace IsaEken\ThemeSystem;
 
-use IsaEken\ThemeSystem\Commands\MakeCommand;
 use IsaEken\ThemeSystem\Commands\InitializeCommand;
+use IsaEken\ThemeSystem\Commands\MakeCommand;
 use IsaEken\ThemeSystem\Commands\PublishCommand;
 use IsaEken\ThemeSystem\Illuminate\FileViewFinder;
 use IsaEken\ThemeSystem\Illuminate\UrlGenerator;
