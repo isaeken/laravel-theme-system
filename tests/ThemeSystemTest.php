@@ -5,7 +5,8 @@ use IsaEken\ThemeSystem\Exceptions\ThemeNotExistsException;
 use function PHPUnit\Framework\assertEquals;
 use function PHPUnit\Framework\assertTrue;
 
-function makeTestingTheme(): string {
+function makeTestingTheme(): string
+{
     $themeDirectory = theme_system()->getThemesDirectory() . '/testing';
     if (! is_dir($themeDirectory)) {
         mkdir(theme_system()->getThemesDirectory() . '/testing', recursive: true);
