@@ -3,6 +3,7 @@
 namespace IsaEken\ThemeSystem\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use IsaEken\ThemeSystem\ThemeSystem;
@@ -83,5 +84,8 @@ class InitializeCommand extends Command
                 $this->info("Created webpack config for theme: $theme->name");
             }
         }
+
+        Artisan::call(ThemeSystem::CommandPrefix . 'publish');
+        $this->info('Themes published.');
     }
 }
