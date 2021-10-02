@@ -27,9 +27,8 @@ abstract class BrowserTestCase extends BaseTestCase
         $themeName = 'browser-test-theme';
 
         if (!theme_system()->isExists($themeName)) {
-            $dir = theme_system()->getThemesDirectory() . '/' . $themeName;
-            File::makeDirectory("$dir/public", recursive: true);
-            File::put("$dir/testing.blade.php", 'Testing');
+            theme_system()->make($themeName);
+            File::put(theme_path($themeName) . "/testing.blade.php", 'Testing');
         }
 
         /** @var Router $router */

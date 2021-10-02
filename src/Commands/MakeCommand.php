@@ -8,14 +8,14 @@ use Illuminate\Support\Facades\File;
 use IsaEken\ThemeSystem\ThemeSystem;
 use IsaEken\ThemeSystem\Webpack;
 
-class CreateCommand extends Command
+class MakeCommand extends Command
 {
     /**
      * The console command signature.
      *
      * @var string
      */
-    protected $signature = ThemeSystem::CommandPrefix . 'create {name}';
+    protected $signature = 'make:theme {name}';
 
     /**
      * The console command description.
@@ -38,19 +38,8 @@ class CreateCommand extends Command
             return;
         }
 
-        $this->info('Creating theme...');
-
-        $dir = theme_system()->getThemesDirectory() . '/' . $name;
-
-        File::makeDirectory($dir . '/public', recursive: true);
-        File::makeDirectory($dir . '/resources/css', recursive: true);
-        File::makeDirectory($dir . '/resources/js', recursive: true);
-        File::put($dir . '/webpack.mix.js', Webpack::generateTheme());
-        File::put($dir . '/resources/css/app.css', '');
-        File::put($dir . '/resources/js/app.js', '');
-
+        theme_system()->make($name);
         Artisan::call(ThemeSystem::CommandPrefix . 'publish');
-
         $this->info("Theme created: $name");
     }
 }

@@ -52,9 +52,9 @@ it('works publish command', function () {
     assertTrue(file_exists(public_path($name)));
 });
 
-it('works create command', function () {
+it('works make command', function () {
     $name = Str::of(Str::random())->lower()->snake('-')->__toString();
-    Artisan::call(ThemeSystem::CommandPrefix . 'create ' . $name);
+    Artisan::call('make:theme ' . $name);
     assertTrue(theme_system()->isExists($name));
 });
 
