@@ -3,6 +3,7 @@
 namespace IsaEken\ThemeSystem\Commands;
 
 use Illuminate\Console\Command;
+use IsaEken\ThemeSystem\ThemeSystem;
 
 class PublishCommand extends Command
 {
@@ -11,7 +12,7 @@ class PublishCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'theme:publish
+    protected $signature = ThemeSystem::CommandPrefix . 'publish
                 {--relative : Create the symbolic link using relative paths}
                 {--force : Recreate existing symbolic links}';
 
