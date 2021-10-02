@@ -9,6 +9,12 @@ class ThemeSystem
 {
     private string|null $theme = null;
 
+    public const PackageName = 'isaeken/laravel-theme-system';
+
+    public const Version = 'v2.1';
+
+    public const CommandPrefix = 'themes:';
+
     /**
      * Check the Theme System is enabled.
      *
