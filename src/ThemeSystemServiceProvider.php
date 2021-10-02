@@ -2,6 +2,7 @@
 
 namespace IsaEken\ThemeSystem;
 
+use IsaEken\ThemeSystem\Commands\CreateCommand;
 use IsaEken\ThemeSystem\Commands\InitializeCommand;
 use IsaEken\ThemeSystem\Commands\PublishCommand;
 use IsaEken\ThemeSystem\Illuminate\FileViewFinder;
@@ -19,6 +20,7 @@ class ThemeSystemServiceProvider extends PackageServiceProvider
             ->hasCommands(
                 PublishCommand::class,
                 InitializeCommand::class,
+                CreateCommand::class,
             );
     }
 
