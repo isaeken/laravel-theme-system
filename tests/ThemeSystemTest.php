@@ -1,7 +1,10 @@
 <?php
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 use IsaEken\ThemeSystem\Exceptions\ThemeNotExistsException;
+use IsaEken\ThemeSystem\ThemeSystem;
+use IsaEken\ThemeSystem\Webpack;
 use function PHPUnit\Framework\assertEquals;
 use function PHPUnit\Framework\assertTrue;
 
@@ -37,4 +40,25 @@ it('get theme asset', function () {
 
     theme_system()->setTheme('testing');
     assertTrue(Str::contains(asset('image.jpg'), 'testing'));
+});
+
+it('works publish command', function () {
+    $name = Str::of(Str::random())->lower()->snake('-')->__toString();
+    if (! is_dir(theme_system()->getThemesDirectory() . "/$name/public")) {
+        mkdir(theme_system()->getThemesDirectory() . "/$name/public", recursive: true);
+    }
+
+    Artisan::call(ThemeSystem::CommandPrefix . 'publish');
+    assertTrue(file_exists(public_path($name)));
+});
+
+it('works create command', function () {
+    $name = Str::of(Str::random())->lower()->snake('-')->__toString();
+    Artisan::call(ThemeSystem::CommandPrefix . 'create ' . $name);
+    assertTrue(theme_system()->isExists($name));
+});
+
+it('works initialize command', function () {
+    Artisan::call(ThemeSystem::CommandPrefix . 'init');
+    assertTrue(file_exists(base_path(Webpack::defaultWebpackPath())));
 });
