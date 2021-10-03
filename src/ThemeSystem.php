@@ -53,6 +53,10 @@ class ThemeSystem
      */
     public function findThemes(): array
     {
+        if (theme_path() === false) {
+            return [];
+        }
+
         $themes = [];
         foreach (scandir(theme_path()) as $path) {
             if ($path == '.' || $path == '..') {
