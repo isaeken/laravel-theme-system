@@ -23,7 +23,8 @@ composer require isaeken/laravel-theme-system
 You can publish the config file with:
 
 ```bash
-php artisan vendor:publish --provider="IsaEken\ThemeSystem\ThemeSystemServiceProvider" --tag="theme-system-config"
+php artisan vendor:publish --provider="IsaEken\ThemeSystem\ThemeSystemServiceProvider" --tag="theme-system-config" --tag="theme-system-migrations"
+php artisan migrate
 ```
 
 Run the following command in the terminal for initializing:
@@ -44,6 +45,26 @@ theme_system()->setTheme('your-theme-name');
 
 ````php
 theme_system()->getCurrentTheme();
+````
+
+### Set theme per user
+
+````php
+// \App\Models\User.php
+class User extends Authenticatable
+{
+    use \IsaEken\ThemeSystem\Traits\CanChooseTheme; // Add this
+    
+    // ...
+}
+````
+
+````php
+// In your controller or middleware
+auth()->user()->theme; // theme for user.
+auth()->user()->theme = 'default'; // theme is saved to db.
+
+auth()->user()->themeApply(); // changed current theme to user theme.
 ````
 
 ### Creating theme
