@@ -12,7 +12,7 @@ class ThemeSystem
 
     public const PackageName = 'isaeken/laravel-theme-system';
 
-    public const Version = 'v2.2';
+    public const Version = 'v2.3';
 
     public const CommandPrefix = 'themes:';
 
