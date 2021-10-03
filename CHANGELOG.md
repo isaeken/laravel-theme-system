@@ -39,3 +39,7 @@ All notable changes to `laravel-theme-system` will be documented in this file.
 - refactored create command to make command
 - added make method in ThemeSystem class
 - added theme middleware
+
+## 2.3 - 2021-10-03
+
+- added CanChooseTheme trait
