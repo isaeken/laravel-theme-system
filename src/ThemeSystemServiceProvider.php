@@ -21,6 +21,9 @@ class ThemeSystemServiceProvider extends PackageServiceProvider
                 PublishCommand::class,
                 InitializeCommand::class,
                 MakeCommand::class,
+            )
+            ->hasMigrations(
+                'create_choose_themes_table',
             );
     }
 
