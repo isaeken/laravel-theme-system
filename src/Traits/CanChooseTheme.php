@@ -41,6 +41,7 @@ trait CanChooseTheme
                 ->update([
                     'theme' => $theme,
                 ]);
+
             return;
         }
 
