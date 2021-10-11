@@ -5,6 +5,7 @@ namespace IsaEken\ThemeSystem;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use IsaEken\ThemeSystem\Exceptions\ThemeNotExistsException;
+use Throwable;
 
 class ThemeSystem
 {
@@ -195,6 +196,52 @@ class ThemeSystem
         return
             theme_path($name) !== false &&
             preg_match(config('theme-system.name_regex', '/(.[a-zA-Z0-9-_]+)/'), $name) !== false;
+    }
+
+    /**
+     * Public or sync asset files to public folders.
+     *
+     * @param  string  $name
+     * @param  bool  $symlink
+     * @param  bool  $relative
+     * @return $this
+     * @throws Throwable
+     */
+    public function publish(string $name, bool $symlink = true, bool $relative = false): static
+    {
+        $theme = collect(theme_system()->findThemes())->where('name', $name)->first();
+        throw_if($theme === null, ThemeNotExistsException::class, $name);
+
+        $themeAssetPath = $theme->directory . '/' . theme_system()->getPublicDirectory();
+        $targetAssetPath = public_path() . '/' . $theme->publicName;
+
+        if (! is_dir($themeAssetPath)) {
+            return $this;
+        }
+
+        if ($symlink) {
+            if (file_exists($targetAssetPath)) {
+                return $this;
+            }
+
+            if ($relative) {
+                File::relativeLink($targetAssetPath, $themeAssetPath);
+            }
+            else {
+                File::link($themeAssetPath, $targetAssetPath);
+            }
+        }
+        else {
+            throw_if(is_link($targetAssetPath), 'RuntimeException', "The [$targetAssetPath] link already exists.");
+
+            if (is_dir($targetAssetPath)) {
+                File::deleteDirectory($targetAssetPath);
+            }
+
+            File::copyDirectory($themeAssetPath, $targetAssetPath);
+        }
+
+        return $this;
     }
 
     /**
