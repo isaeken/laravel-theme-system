@@ -12,6 +12,24 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 class ThemeSystemServiceProvider extends PackageServiceProvider
 {
+    public array $singletons = [];
+
+    public function __construct($app)
+    {
+        parent::__construct($app);
+
+        $this->singletons['view.finder'] = function ($app) {
+            return new FileViewFinder($app['files'], app(ThemeSystem::class)->resolvePaths());
+        };
+
+        $this->singletons['url'] = function ($app) {
+            return new UrlGenerator(
+                app('router')->getRoutes(),
+                app('request')
+            );
+        };
+    }
+
     public function configurePackage(Package $package): void
     {
         $package
@@ -38,22 +56,19 @@ class ThemeSystemServiceProvider extends PackageServiceProvider
             return new ThemeSystem();
         });
 
+        $this->app->singleton('theme.view.finder', $this->singletons['view.finder']);
+
+        $this->app->singleton('theme.url', $this->singletons['url']);
+
         if (config('theme-system.enable')) {
             /** @var ThemeSystem $themeSystem */
             $themeSystem = app(ThemeSystem::class);
             $themeSystem->setTheme(config('theme-system.theme'));
 
-            $this->app->bind('view.finder', function ($app) use ($themeSystem) {
-                return new FileViewFinder($app['files'], $themeSystem->resolvePaths());
-            });
+            $this->app->singleton('view.finder', $this->singletons['view.finder']);
 
             if ($themeSystem->isAssetsEnabled()) {
-                $this->app->singleton('url', function ($app) {
-                    return new UrlGenerator(
-                        app('router')->getRoutes(),
-                        app('request')
-                    );
-                });
+                $this->app->singleton('url', $this->singletons['url']);
             }
         }
     }
