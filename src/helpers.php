@@ -27,3 +27,30 @@ if (! function_exists('theme_path')) {
         return realpath(theme_system()->getThemesDirectory() . DIRECTORY_SEPARATOR . $path);
     }
 }
+
+if (! function_exists('theme_asset')) {
+    /**
+     * Generate the URL to an application asset.
+     *
+     * @param  string  $path
+     * @param  bool|null  $secure
+     * @return string
+     */
+    function theme_asset(string $path, bool|null $secure = null): string
+    {
+        return app('theme.url')->asset($path, $secure);
+    }
+}
+
+if (! function_exists('theme_secure_asset')) {
+    /**
+     * Generate the URL to a secure asset.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    function theme_secure_asset(string $path): string
+    {
+        return theme_asset($path, true);
+    }
+}
