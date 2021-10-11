@@ -226,12 +226,10 @@ class ThemeSystem
 
             if ($relative) {
                 File::relativeLink($targetAssetPath, $themeAssetPath);
-            }
-            else {
+            } else {
                 File::link($themeAssetPath, $targetAssetPath);
             }
-        }
-        else {
+        } else {
             throw_if(is_link($targetAssetPath), 'RuntimeException', "The [$targetAssetPath] link already exists.");
 
             if (is_dir($targetAssetPath)) {
