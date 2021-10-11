@@ -1,0 +1,15 @@
+// {{ notice }}
+
+let theme = process.env.npm_config_theme;
+
+if (theme) {
+    global.{{ var_resource_root }} = './{{ themes_path }}/' + theme + '/{{ resources_dir }}';
+    global.{{ var_public_path }} = './{{ public_path }}/' + theme + '/';
+
+    const { mix } = require('./{{ themes_path }}/' + theme + '/webpack.mix.js');
+    mix.setPublicPath({{ var_public_path }});
+}
+else {
+    theme = 'default';
+    require('./{{ default_webpack_path }}');
+}
