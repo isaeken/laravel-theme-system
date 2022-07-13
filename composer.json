@@ -27,7 +27,7 @@
         "illuminate/contracts": "^8.62|^9.0"
     },
     "require-dev": {
-        "nunomaduro/collision": "^5.10",
+        "nunomaduro/collision": "^5.10|^6.1",
         "orchestra/testbench": "^6.21",
         "orchestra/testbench-browser-kit": "^6.16",
         "pestphp/pest": "^1.20",
